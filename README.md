@@ -10,10 +10,18 @@ Claude Sonnet 4.6 | /Users/you/my-project | ctx:[██░░░░░░░░]
 
 ## Requirements
 
-- [jq](https://stedolan.github.io/jq/)
+- [jq](https://stedolan.github.io/jq/) — `brew install jq`
 - `awk` (standard on macOS/Linux)
 
-## Installation
+## One-line Install
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/nathankim0/simple-claude-statusline/main/install.sh | sh
+```
+
+Then restart Claude Code.
+
+## Manual Installation
 
 1. Copy `statusline.sh` to a permanent location:
 
