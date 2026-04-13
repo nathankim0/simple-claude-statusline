@@ -1,35 +1,68 @@
 # simple-claude-statusline
 
-A compact, zero-dependency Claude Code status line. Shows model, git branch, session changes, context usage, and rate limits — all in a single readable line.
-
-## Preview
+> Minimal, readable status line for [Claude Code](https://claude.ai/code) — no Node, no npm, just a shell script.
 
 ```
 Sonnet 4.6 | my-project [main*] | +356 -48 | ctx:39% | 5h:24% ⏳ 2h16m | 7d:37% ⏳ 4d6h
 ```
 
-## Requirements
+---
 
-- [jq](https://stedolan.github.io/jq/) — `brew install jq`
-- `git`, `awk`, `date` (standard on macOS/Linux)
+## Features
 
-## One-line Install
+- **Git-aware** — shows repo name, branch, and dirty state
+- **Session tracking** — lines added/removed since session start
+- **Rate limits** — 5h and 7d usage with countdown to reset
+- **Context window** — how full your context is
+- **Worktree support** — shows active worktree name
+- **Vim mode** — INSERT/VISUAL indicator (silent in NORMAL)
+- **No dependencies** — just `jq`, `git`, `awk` (all standard on macOS/Linux)
+
+---
+
+## Install
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/nathankim0/simple-claude-statusline/main/install.sh | sh
 ```
 
-Then restart Claude Code.
+Requires `jq` — install with `brew install jq` if missing.
 
-## Manual Installation
+Restart Claude Code after install.
 
-1. Copy `statusline.sh` to a permanent location:
+---
+
+## What each field means
+
+```
+Sonnet 4.6 | my-project [main*] | +356 -48 | ctx:39% | 5h:24% ⏳ 2h16m | 7d:37% ⏳ 4d6h
+│             │                   │           │          │                   │
+│             │                   │           │          │                   └ 7-day rate limit + reset
+│             │                   │           │          └ 5-hour rate limit + reset
+│             │                   │           └ context window usage
+│             │                   └ lines added / removed this session
+│             └ git root name + branch (* = uncommitted changes)
+└ model name (Claude prefix stripped)
+```
+
+| Field | Notes |
+|-------|-------|
+| Model | `Claude ` prefix stripped for brevity |
+| Workspace | Git root directory name. Falls back to `basename` of cwd |
+| Branch | `[main]` clean · `[main*]` dirty · `{name}` worktree |
+| Lines | Hidden when both are zero |
+| Vim mode | Only shown when INSERT / VISUAL / REPLACE |
+| Reset time | `23m` · `2h16m` · `4d6h` — hidden when limit already reset |
+
+---
+
+## Manual install
 
 ```sh
 cp statusline.sh ~/.claude/statusline.sh
 ```
 
-2. Add to `~/.claude/settings.json`:
+Add to `~/.claude/settings.json`:
 
 ```json
 {
@@ -40,21 +73,4 @@ cp statusline.sh ~/.claude/statusline.sh
 }
 ```
 
-3. Restart Claude Code.
-
-## What it shows
-
-| Field | Example | Description |
-|-------|---------|-------------|
-| Model | `Sonnet 4.6` | Current model (`Claude ` prefix stripped) |
-| Workspace | `my-project [main*]` | Git root name + branch (`*` = uncommitted changes) |
-| Worktree | `my-project [main] {feat}` | Worktree name shown in braces when active |
-| Lines changed | `+356 -48` | Lines added/removed this session |
-| Vim mode | `-- INS --` | Shown only when not in NORMAL mode |
-| Context | `ctx:39%` | Context window usage |
-| 5h rate limit | `5h:24% ⏳ 2h16m` | 5-hour usage + time until reset |
-| 7d rate limit | `7d:37% ⏳ 4d6h` | 7-day usage + time until reset |
-
-- Rate limit and reset timer only appear after the first response
-- Lines changed hidden when both are zero
-- Reset time format: `23m` / `2h16m` / `4d6h`
+Restart Claude Code.
