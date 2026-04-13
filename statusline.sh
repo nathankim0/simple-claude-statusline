@@ -43,8 +43,20 @@ make_bar() {
   echo "$bar"
 }
 
-# Model + full PWD
-parts="$model | $cwd"
+# Git branch + dirty indicator
+git_info=""
+if [ -n "$cwd" ] && git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
+  branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
+  dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
+  if [ -n "$dirty" ]; then
+    git_info=" [$branch*]"
+  else
+    git_info=" [$branch]"
+  fi
+fi
+
+# Model + full PWD + git
+parts="$model | $cwd$git_info"
 
 # Context window usage
 if [ -n "$used_pct" ]; then
