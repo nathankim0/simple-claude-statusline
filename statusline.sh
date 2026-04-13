@@ -103,7 +103,7 @@ if [ -n "$five_pct" ]; then
   five=$(printf "%.0f" "$five_pct")
   reset_str=""
   t=$(fmt_reset "$five_reset")
-  [ -n "$t" ] && reset_str=" (↻${t})"
+  [ -n "$t" ] && reset_str=" ⏳ ${t}"
   parts="${parts}${SEP}5h:${five}%${reset_str}"
 fi
 
@@ -112,7 +112,7 @@ if [ -n "$week_pct" ]; then
   week=$(printf "%.0f" "$week_pct")
   reset_str=""
   t=$(fmt_reset "$week_reset")
-  [ -n "$t" ] && reset_str=" (↻${t})"
+  [ -n "$t" ] && reset_str=" ⏳ ${t}"
   parts="${parts}${SEP}7d:${week}%${reset_str}"
 fi
 
