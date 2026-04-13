@@ -37,6 +37,37 @@ fmt_reset() {
   fmt_duration "$diff"
 }
 
+# ── Absolute reset time in Korean ────────────────────────────────
+# 오늘 13:20  |  내일 14:00  |  4월 17일 09:30
+fmt_reset_time() {
+  ts="$1"
+  [ -z "$ts" ] && return
+
+  # Cross-platform date conversion (BSD on macOS vs GNU on Linux)
+  if date -r "$ts" "+%Y-%m-%d" >/dev/null 2>&1; then
+    target_date=$(date -r "$ts" "+%Y-%m-%d")
+    target_hhmm=$(date -r "$ts" "+%H:%M")
+    target_mon=$(date -r "$ts" "+%-m")
+    target_day=$(date -r "$ts" "+%-d")
+    tomorrow=$(date -v+1d "+%Y-%m-%d")
+  else
+    target_date=$(date -d "@$ts" "+%Y-%m-%d")
+    target_hhmm=$(date -d "@$ts" "+%H:%M")
+    target_mon=$(date -d "@$ts" "+%-m")
+    target_day=$(date -d "@$ts" "+%-d")
+    tomorrow=$(date -d "+1 day" "+%Y-%m-%d")
+  fi
+  today=$(date "+%Y-%m-%d")
+
+  if [ "$target_date" = "$today" ]; then
+    echo "오늘 ${target_hhmm}"
+  elif [ "$target_date" = "$tomorrow" ]; then
+    echo "내일 ${target_hhmm}"
+  else
+    echo "${target_mon}월 ${target_day}일 ${target_hhmm}"
+  fi
+}
+
 # ── Parse JSON ────────────────────────────────────────────────────
 model_raw=$(echo "$input" | jq -r '.model.display_name // .model // "Unknown"')
 cwd=$(echo "$input"       | jq -r '.workspace.current_dir // .cwd // ""')
@@ -103,7 +134,8 @@ if [ -n "$five_pct" ]; then
   five=$(printf "%.0f" "$five_pct")
   reset_str=""
   t=$(fmt_reset "$five_reset")
-  [ -n "$t" ] && reset_str=" ⏳ ${t}"
+  abs=$(fmt_reset_time "$five_reset")
+  [ -n "$t" ] && reset_str=" ⏳ ${t} (${abs})"
   parts="${parts}${SEP}5h:${five}%${reset_str}"
 fi
 
@@ -112,7 +144,8 @@ if [ -n "$week_pct" ]; then
   week=$(printf "%.0f" "$week_pct")
   reset_str=""
   t=$(fmt_reset "$week_reset")
-  [ -n "$t" ] && reset_str=" ⏳ ${t}"
+  abs=$(fmt_reset_time "$week_reset")
+  [ -n "$t" ] && reset_str=" ⏳ ${t} (${abs})"
   parts="${parts}${SEP}7d:${week}%${reset_str}"
 fi
 
