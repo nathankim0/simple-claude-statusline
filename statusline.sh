@@ -49,22 +49,35 @@ fmt_reset_time() {
     target_hhmm=$(date -r "$ts" "+%H:%M")
     target_mon=$(date -r "$ts" "+%-m")
     target_day=$(date -r "$ts" "+%-d")
+    target_dow=$(date -r "$ts" "+%u")
     tomorrow=$(date -v+1d "+%Y-%m-%d")
   else
     target_date=$(date -d "@$ts" "+%Y-%m-%d")
     target_hhmm=$(date -d "@$ts" "+%H:%M")
     target_mon=$(date -d "@$ts" "+%-m")
     target_day=$(date -d "@$ts" "+%-d")
+    target_dow=$(date -d "@$ts" "+%u")
     tomorrow=$(date -d "+1 day" "+%Y-%m-%d")
   fi
   today=$(date "+%Y-%m-%d")
+
+  # Day-of-week in Korean (1=Mon .. 7=Sun)
+  case "$target_dow" in
+    1) dow_kr="월" ;;
+    2) dow_kr="화" ;;
+    3) dow_kr="수" ;;
+    4) dow_kr="목" ;;
+    5) dow_kr="금" ;;
+    6) dow_kr="토" ;;
+    7) dow_kr="일" ;;
+  esac
 
   if [ "$target_date" = "$today" ]; then
     echo "오늘 ${target_hhmm}"
   elif [ "$target_date" = "$tomorrow" ]; then
     echo "내일 ${target_hhmm}"
   else
-    echo "${target_mon}월 ${target_day}일 ${target_hhmm}"
+    echo "${target_mon}.${target_day}(${dow_kr}) ${target_hhmm}"
   fi
 }
 
